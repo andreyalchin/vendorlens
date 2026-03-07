@@ -2,30 +2,36 @@
 
 import { useState, useEffect } from 'react';
 import { Tool } from './types';
-import { seedTools } from './seed';
-
-const STORAGE_KEY = 'vendorlens_tools';
-const SEEDED_KEY = 'vendorlens_seeded';
+import { getSeedTools } from './seed';
+import { useClientContext } from './ClientContext';
 
 export function useTools() {
+  const { selectedClient } = useClientContext();
+  const clientId = selectedClient.id;
+
   const [tools, setTools] = useState<Tool[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    setLoaded(false);
+    setTools([]);
+    const STORAGE_KEY = `vendorlens_tools_${clientId}`;
+    const SEEDED_KEY = `vendorlens_seeded_${clientId}`;
     const seeded = localStorage.getItem(SEEDED_KEY);
     if (!seeded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(seedTools));
+      const seeds = getSeedTools(clientId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(seeds));
       localStorage.setItem(SEEDED_KEY, 'true');
-      setTools(seedTools);
+      setTools(seeds);
     } else {
       const stored = localStorage.getItem(STORAGE_KEY);
       setTools(stored ? JSON.parse(stored) : []);
     }
     setLoaded(true);
-  }, []);
+  }, [clientId]);
 
   const save = (updated: Tool[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    localStorage.setItem(`vendorlens_tools_${clientId}`, JSON.stringify(updated));
     setTools(updated);
   };
 

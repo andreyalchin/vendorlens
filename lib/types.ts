@@ -7,13 +7,15 @@ export type ToolCategory =
   | 'HR'
   | 'Docs'
   | 'Security'
+  | 'Analytics'
+  | 'Development'
   | 'Other';
 
 export interface Tool {
   id: string;
   name: string;
   category: ToolCategory;
-  monthlyCost: number; // USD
+  monthlyCost: number;
   seats: number;
   owner: string;
   renewalDate: string; // ISO date string
@@ -32,7 +34,14 @@ export interface ApprovalRequest {
   urgency: Urgency;
   requester: string;
   status: RequestStatus;
-  submittedAt: string; // ISO date string
+  submittedAt: string;
   reviewedAt?: string;
   reviewerComment?: string;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  industry: string;
+  employees: number;
 }

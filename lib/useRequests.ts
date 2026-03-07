@@ -2,29 +2,35 @@
 
 import { useState, useEffect } from 'react';
 import { ApprovalRequest } from './types';
-import { seedRequests } from './seed';
-
-const STORAGE_KEY = 'vendorlens_requests';
-const SEEDED_KEY = 'vendorlens_seeded';
+import { getSeedRequests } from './seed';
+import { useClientContext } from './ClientContext';
 
 export function useRequests() {
+  const { selectedClient } = useClientContext();
+  const clientId = selectedClient.id;
+
   const [requests, setRequests] = useState<ApprovalRequest[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    setLoaded(false);
+    setRequests([]);
+    const STORAGE_KEY = `vendorlens_requests_${clientId}`;
+    const SEEDED_KEY = `vendorlens_seeded_${clientId}`;
     const seeded = localStorage.getItem(SEEDED_KEY);
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!seeded || !stored) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(seedRequests));
-      setRequests(seedRequests);
+      const seeds = getSeedRequests(clientId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(seeds));
+      setRequests(seeds);
     } else {
       setRequests(JSON.parse(stored));
     }
     setLoaded(true);
-  }, []);
+  }, [clientId]);
 
   const save = (updated: ApprovalRequest[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    localStorage.setItem(`vendorlens_requests_${clientId}`, JSON.stringify(updated));
     setRequests(updated);
   };
 
@@ -42,12 +48,7 @@ export function useRequests() {
     save(
       requests.map((r) =>
         r.id === id
-          ? {
-              ...r,
-              status,
-              reviewedAt: new Date().toISOString(),
-              reviewerComment: comment,
-            }
+          ? { ...r, status, reviewedAt: new Date().toISOString(), reviewerComment: comment }
           : r
       )
     );

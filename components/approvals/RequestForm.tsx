@@ -12,6 +12,8 @@ const CATEGORIES: ToolCategory[] = [
   'HR',
   'Docs',
   'Security',
+  'Analytics',
+  'Development',
   'Other',
 ];
 
