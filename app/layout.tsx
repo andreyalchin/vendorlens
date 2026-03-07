@@ -3,6 +3,7 @@ import './globals.css';
 import { ClientProvider } from '@/lib/ClientContext';
 import Sidebar from '@/components/layout/Sidebar';
 import AgentButton from '@/components/agent/AgentButton';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: 'VendorLens — SaaS Spend Intelligence',
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <AgentButton />
         </ClientProvider>
+        <Analytics />
       </body>
     </html>
   );
