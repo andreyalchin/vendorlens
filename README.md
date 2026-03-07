@@ -1,87 +1,214 @@
-# VendorLens — SaaS Spend Intelligence Platform
+# VendorLens — AI SaaS Procurement Intelligence Platform
 
-Built by [Andrey Alchin](https://www.linkedin.com/in/aalchin/) · Senior Product Manager
+Built by **[Andrey Alchin](https://www.linkedin.com/in/aalchin/)** · Senior Product Manager
 
-A full-stack portfolio project demonstrating deep domain knowledge in SaaS procurement, software spend management, and approval workflows — the core problem space of modern procurement platforms.
+VendorLens is a full-stack product prototype exploring how AI can help companies understand, control, and optimize SaaS spend. It demonstrates product thinking across procurement analytics, spend management, approval workflows, and AI-assisted contract intelligence — the core problem space of modern SaaS procurement platforms like Vendr, Zylo, and Torii.
 
----
-
-## What it solves
-
-Enterprise software stacks grow faster than procurement teams can manage them. Teams end up paying for overlapping tools, missing renewal windows, and approving purchases without budget context. VendorLens surfaces those problems in one place:
-
-- **Spend visibility** — total stack cost, category breakdowns, cost-per-seat benchmarking
-- **Overlap detection** — automatically groups tools by category and flags redundancy with estimated savings
-- **Approval workflows** — structured intake process with requester/manager views, urgency signals, and budget impact context
-- **AI procurement assistant** — natural language queries against live stack data with actionable, linked responses
+**[Live Demo](https://vendorlens.vercel.app/)** · **[Repository](https://github.com/andreyalchin/vendorlens)**
 
 ---
 
-## Features
+## The Problem
 
-### Dashboard
-- Summary cards for Total Annual Spend, Tools, Upcoming Renewals, and Avg Cost/Seat — each expandable into a detail chart
-- Annual spend by category — switchable between bar and donut views
-- Full tools table with column sorting, search, and category filtering
-- Add, edit, and delete tools inline
+Enterprise SaaS stacks grow faster than procurement teams can manage them. Organizations frequently experience:
 
-### Overlap Detector
-- Automatically identifies categories with 2+ tools
-- Side-by-side comparison of overlapping tools (cost, seats, owner, renewal)
-- Estimated annual savings if consolidated
-- One-click "Consolidate" or "Keep Both" decision recording
+- Overlapping tools across departments
+- Uncontrolled SaaS purchasing at the team level
+- Missed contract renewal windows with auto-renewal traps
+- Aggressive price escalation clauses buried in contracts
+- No spend visibility across categories or business units
+
+The result: companies routinely overspend 20–30% on SaaS annually.
+
+Procurement teams need tools that surface **spend risk**, **renewal awareness**, and **structured approval workflows** — without requiring weeks of manual auditing.
+
+---
+
+## The Solution
+
+VendorLens centralizes SaaS procurement insights into a single platform. It combines:
+
+- SaaS spend analytics
+- Overlap detection
+- Approval workflows
+- Contract intelligence
+- An AI procurement assistant
+
+This allows teams to quickly answer the questions that matter most:
+
+> *Where is our SaaS budget going? Which tools overlap? Which contracts are risky? When do renewals occur? Where can we negotiate savings?*
+
+---
+
+## Core Features
+
+### Procurement Dashboard
+
+Real-time visibility into SaaS stack health.
+
+- **KPI cards** for Total Spend, Total Vendors, Contracts at Risk, and Estimated Savings — each expandable into a detail panel
+- **Annual spend by category** — bar and donut chart views
+- **Interactive charts** with category drill-down that filter the vendor table
+- **Full vendor table** with search, filtering, column sorting, and inline editing
+
+### SaaS Overlap Detector
+
+Automatically identifies redundant tools across categories.
+
+For example, a CRM category containing Salesforce, HubSpot, and Pipedrive is flagged with:
+
+- Side-by-side cost and seat comparisons
+- Renewal timelines per tool
+- Estimated annual consolidation savings
+
+Users can record decisions — **Consolidate** or **Keep Both** — directly in the interface.
 
 ### Approval Workflow
-- **Requester view** — submit tool requests with use case, cost estimate, and urgency
-- **Manager view** — pending queue and history tab, budget impact vs. category average, approve/deny with comments
-- Status badges and full audit trail
 
-### AI Agent
-- Floating chat assistant powered by Claude (claude-haiku-4-5-20251001)
-- Reads live stack data per client — answers questions about savings, renewals, health score, seat utilization, and vendor risk
-- Structured markdown responses with clickable navigation links
-- Quick-action chips for common queries
+Models the real procurement intake process with two distinct personas.
 
-### Multi-client support
-- Switch between 3 demo clients (Nexus Systems, Orbit Analytics, Cascade Labs)
-- Each client has an isolated tool stack and approval pipeline
-- Data persists per client in localStorage
+**Requester View**
+- Submit tool requests with use case, cost estimate, urgency level, and category
+- Track request status (Pending / Approved / Denied)
+
+**Manager View**
+- Approval queue with budget impact vs. category average
+- Urgency indicators and full request context
+- Approve or deny with optional comments
+- Complete decision history and audit trail
+
+### AI Procurement Assistant
+
+A floating chat assistant powered by Anthropic Claude, available on every page.
+
+The assistant reads live stack data and answers natural language procurement questions:
+
+- *Which tools overlap in the CRM category?*
+- *What renewals are coming up this quarter?*
+- *Where can we reduce SaaS costs?*
+- *What's our total spend by category?*
+
+Responses include structured insights and navigation links to relevant sections of the dashboard. Quick-action chips surface the most common queries instantly.
+
+### Contract Intelligence
+
+An AI-assisted contract analysis module for evaluating SaaS agreements before signing.
+
+Paste any SaaS contract to identify:
+
+- Pricing structure and total commitment
+- Renewal terms and notice deadlines
+- Annual price escalation clauses
+- Vendor lock-in risks and data portability constraints
+- Negotiation leverage and recommended tactics
+
+**Example output:**
+
+```
+Risk Score: 7 / 10 — High Risk
+
+Key Risks
+  • 7% annual price increase clause at renewal
+  • 60-day non-renewal notice window
+  • Custom objects not exportable to third-party systems
+
+Negotiation Recommendations
+  • Cap annual increases at 3–5%
+  • Reduce cancellation window to 30 days
+  • Negotiate data portability guarantees
+```
+
+The module also generates a ready-to-send vendor negotiation email based on the detected risks.
+
+### Multi-Client Environment
+
+VendorLens simulates a real procurement platform by supporting multiple isolated client environments.
+
+| Client | Industry | Employees |
+|---|---|---|
+| Nexus Systems | B2B SaaS | 125 |
+| Orbit Analytics | Data & AI | 45 |
+| Cascade Labs | Software Dev | 80 |
+
+Each client has an independent SaaS stack, approval pipeline, and spend profile. Data is persisted per client in localStorage.
 
 ---
 
-## Tech stack
+## Tech Stack
 
-| Layer | Choice |
+| Layer | Technology |
 |---|---|
 | Framework | Next.js 14 (App Router) |
 | Language | TypeScript |
 | Styling | Tailwind CSS |
 | Charts | Recharts |
-| AI | Anthropic Claude API (streaming) |
+| AI | Anthropic Claude API |
 | State | localStorage + React hooks |
-| Deploy | Vercel |
+| Deployment | Vercel |
 
 ---
 
+## Product Thinking Behind the Build
 
-Open [https://vendorlens.vercel.app/].
+### Category-First Stack Auditing
 
-> On first load, seed data is automatically populated for all three demo clients.
+Overlap detection groups tools by category, mirroring how procurement teams audit SaaS stacks in practice. This surfaces redundancy much faster than tool-by-tool analysis and produces immediately actionable consolidation targets.
+
+### Dual-Persona Workflow Design
+
+The approval system is built around two distinct procurement personas — Requester and Manager — each with different information needs. Contextual signals like budget impact vs. category average and urgency level reduce approval friction and back-and-forth communication.
+
+### AI Capability Scoping
+
+The AI assistant focuses on the seven questions procurement managers ask most: savings opportunities, renewal timelines, vendor risk, budget breakdown, stack health score, seat utilization, and consolidation planning. Scoping AI capability to real operational needs makes it immediately useful rather than exploratory.
+
+### Multi-Tenant Architecture
+
+The multi-client environment reflects how real procurement SaaS platforms serve multiple organizations with fully isolated data environments — demonstrating both product and architectural thinking.
 
 ---
 
-## Product thinking behind the build
+## Running the Project
 
-This project was scoped and built to reflect how a Senior PM approaches a product problem — not just feature delivery, but workflow design:
+The live demo is available at **[vendorlens.vercel.app](https://vendorlens.vercel.app/)**.
 
-- **Overlap detection logic** mirrors how procurement teams actually audit stacks: category-first, not tool-first
-- **Approval workflow** has a dual-persona design (requester vs. manager) with contextual signals (budget impact vs. category average, urgency) that reduce back-and-forth
-- **AI agent capabilities** were chosen based on the 7 questions procurement managers ask most: savings, renewals, budget breakdown, queue digest, stack health, seat utilization, and vendor risk
-- **Multi-client architecture** reflects how procurement platforms serve multiple accounts with isolated data
+On first load, demo data automatically populates for all three client environments. No setup required.
+
+To run locally:
+
+```bash
+npm install
+# Add ANTHROPIC_API_KEY to .env.local
+npm run dev
+```
+
+---
+
+## Future Roadmap
+
+- PDF contract upload and parsing
+- SaaS vendor pricing benchmarks by category
+- Renewal alert notifications and calendar integration
+- Automated vendor negotiation email generation
+- License utilization tracking and seat right-sizing
+- Real-time procurement analytics with team-level visibility
+
+---
+
+## Key Product Learnings
+
+AI can significantly reduce the time spent analyzing vendor agreements and auditing SaaS stacks. However, building trustworthy AI procurement tools requires structured outputs, explainable reasoning, and transparent risk indicators.
+
+Balancing automation with clarity is critical when designing AI systems for business decision-making — where the cost of a wrong recommendation is measured in contract dollars.
 
 ---
 
 ## Author
 
 **Andrey Alchin** — Senior Product Manager
+
 [linkedin.com/in/aalchin](https://www.linkedin.com/in/aalchin/)
+
+---
+
+*VendorLens was built as a portfolio experiment exploring how AI and analytics can improve SaaS procurement decision-making — demonstrating both product strategy thinking and technical product execution.*
