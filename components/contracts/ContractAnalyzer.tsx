@@ -7,7 +7,8 @@ import {
   FileText, Lightbulb, Mail, ChevronUp, Calendar,
 } from 'lucide-react';
 
-const SAMPLE_CONTRACT = `SAAS SUBSCRIPTION AGREEMENT
+const SAMPLE_CONTRACTS: Record<string, string> = {
+  'Salesforce Enterprise': `SAAS SUBSCRIPTION AGREEMENT
 
 This Software as a Service Subscription Agreement is entered into between Nexus Systems Inc. ("Customer") and Salesforce, Inc. ("Vendor").
 
@@ -27,7 +28,72 @@ Upon termination or expiration of this Agreement, Customer may request an export
 Customer's use of Vendor APIs is subject to rate limits. API calls exceeding 5,000,000 per month will be charged at $0.002 per call. Vendor reserves the right to modify API specifications with thirty (30) days notice.
 
 6. PRICE PROTECTION
-Vendor shall provide Customer with sixty (60) days advance written notice of any price increase. However, Vendor reserves the right to adjust fees annually at the time of renewal, provided such increases do not exceed the greater of seven percent (7%) or the Consumer Price Index increase for the preceding twelve months.`;
+Vendor shall provide Customer with sixty (60) days advance written notice of any price increase. However, Vendor reserves the right to adjust fees annually at the time of renewal, provided such increases do not exceed the greater of seven percent (7%) or the Consumer Price Index increase for the preceding twelve months.`,
+
+  'Microsoft 365 Enterprise': `MICROSOFT ENTERPRISE AGREEMENT
+
+This Enterprise Agreement ("EA") is entered into between Cascade Labs Inc. ("Customer") and Microsoft Corporation ("Microsoft").
+
+1. ENROLLMENT TERM AND RENEWAL
+The Enrollment Term is three (3) years, commencing February 1, 2026 and expiring January 31, 2029. Customer must provide written notice of non-renewal at least one hundred eighty (180) days prior to expiration. Microsoft may adjust pricing annually pursuant to the True-Up process. If Customer fails to provide timely notice, the EA will automatically extend for an additional twelve (12) month period at the then-current pricing.
+
+2. TRUE-UP AND SEAT RECONCILIATION
+Customer agrees to conduct an Annual True-Up within thirty (30) days of each enrollment anniversary. Customer shall report and pay for any additional licenses deployed during the prior year. Microsoft reserves the right to audit Customer's software deployments at any time during the Enrollment Term. Under-reporting of deployments by more than five percent (5%) may result in immediate invoicing plus an administrative fee of fifteen percent (15%) of the unreported license value.
+
+3. FEES AND PAYMENT
+Customer agrees to pay $18,750 per month for 250 Microsoft 365 E3 licenses at $75 per user per month. An upfront commitment payment of $67,500 (representing six months) is due within fifteen (15) days of EA execution. All fees are non-cancellable and non-refundable for the Enrollment Term.
+
+4. DATA RESIDENCY AND PORTABILITY
+Customer data is stored in Microsoft Azure data centers. Upon termination, Customer may export data using Microsoft-provided tools within ninety (90) days. After ninety (90) days, Microsoft has no obligation to retain Customer data. Integrations, Power Automate workflows, and SharePoint customizations are proprietary to the Microsoft 365 ecosystem and cannot be exported in a platform-agnostic format.
+
+5. PRICE ESCALATION
+Microsoft reserves the right to increase license fees upon renewal. For multi-year EAs, pricing for each subsequent year may increase by the greater of: (a) five percent (5%), or (b) the year-over-year change in the United States CPI-U index. Microsoft will provide ninety (90) days written notice of pricing changes at renewal.
+
+6. TERMINATION FOR CONVENIENCE
+Customer may not terminate this EA for convenience during the Enrollment Term. Early termination by Customer shall result in a termination fee equal to fifty percent (50%) of the remaining committed fees for the balance of the Enrollment Term.`,
+
+  'Okta Identity Cloud': `OKTA WORKFORCE IDENTITY CLOUD SUBSCRIPTION AGREEMENT
+
+This Subscription Agreement is between Orbit Analytics, Inc. ("Customer") and Okta, Inc. ("Okta").
+
+1. SUBSCRIPTION TERM
+The Subscription Term commences on March 1, 2026 for a period of twenty-four (24) months. Customer must provide written notice of non-renewal no fewer than forty-five (45) days prior to the expiration of the then-current Subscription Term. Failure to provide such notice shall result in automatic renewal for a period of twelve (12) months at a price increase not to exceed ten percent (10%) over the prior Subscription Term's fees.
+
+2. SUBSCRIPTION FEES
+Customer agrees to pay $32,400 annually ($2,700 per month) for 45 Workforce Identity Cloud seats at the Professional tier, including Adaptive Multi-Factor Authentication and Universal Directory. All fees are payable annually in advance. Okta may introduce usage-based pricing components for API access exceeding 500,000 API calls per month, billed at $0.005 per excess call.
+
+3. PLATFORM DEPENDENCIES AND LOCK-IN
+Customer acknowledges that Okta's Universal Directory serves as the system of record for all user identities during the Subscription Term. All application integrations (SAML, OIDC, SCIM provisioning) are configured through the Okta platform. Upon termination, Customer may export user directory data in CSV format. However, all authentication policies, group memberships, application assignments, and workflow automations built in Okta Workflows are not exportable in a format compatible with third-party identity providers. Customer should plan for 60-90 days of re-implementation effort when migrating to an alternative solution.
+
+4. SECURITY INCIDENT LIABILITY
+Okta's liability for any security incident affecting Customer data is limited to the fees paid by Customer in the twelve (12) months immediately preceding the incident. Customer is responsible for implementing Okta's recommended security configurations. Failure to enable phishing-resistant MFA for privileged accounts shall constitute Customer's assumption of risk for any resulting incident.
+
+5. PRICE ESCALATION
+Okta reserves the right to increase the per-seat fee by up to ten percent (10%) annually upon renewal. Additionally, Okta may introduce new product tiers that reclassify features currently included in Customer's subscription to higher-tier plans requiring incremental fees, with sixty (60) days advance written notice.`,
+
+  'Snowflake Data Cloud': `SNOWFLAKE DATA CLOUD ORDER FORM AND TERMS
+
+This Order Form is entered into by Orbit Analytics, Inc. ("Customer") and Snowflake Inc. ("Snowflake") under the Snowflake Master Service Agreement.
+
+1. CONSUMPTION-BASED PRICING MODEL
+Customer's use of Snowflake is billed on a consumption basis measured in Snowflake Credits. Credits are consumed by virtual warehouse compute at a rate determined by warehouse size and activity duration. Customer has committed to a minimum annual spend of $38,400 (320 credits per month at $120/credit for Standard Edition). Credits consumed in excess of the committed minimum are charged at the on-demand rate of $144 per credit. Unused committed credits expire at the end of each contract year and are non-refundable.
+
+2. STORAGE FEES
+Customer will be charged $23 per terabyte per month for data storage. Storage is billed for all data stored in Customer's Snowflake account, including Time Travel data (default 1 day for Standard, configurable up to 90 days for Enterprise), Fail-safe data (7-day retention), and Snowflake-managed materialized views.
+
+3. CONTRACT TERM AND RENEWAL
+The initial term is twelve (12) months commencing April 1, 2026. Customer must provide written notice of non-renewal at least thirty (30) days prior to expiration. If Customer's actual consumption exceeds the committed spend by twenty percent (20%) or more for two consecutive months, Snowflake reserves the right to require an upward commitment adjustment at renewal.
+
+4. DATA EGRESS CHARGES
+Transfer of data out of Snowflake to external cloud regions or providers incurs egress charges. Cross-region replication within AWS is charged at $0.08 per GB. Transfer to non-AWS providers is charged at $0.15 per GB. These charges are in addition to and separate from Credit consumption.
+
+5. LOCK-IN AND PORTABILITY
+Customer data stored in Snowflake's proprietary columnar format may be unloaded via COPY INTO commands to cloud storage in CSV, JSON, Parquet, or Avro format at any time. However, all Snowflake-specific features including Snowpark pipelines, data sharing via Snowflake Marketplace, Streamlit applications, and dynamic tables are proprietary to the Snowflake platform and cannot be migrated to alternative data platforms without complete re-engineering.
+
+6. PRICE ADJUSTMENT
+Snowflake reserves the right to adjust credit pricing annually. For Standard Edition customers, price increases are capped at eight percent (8%) per year. Snowflake may restructure its credit consumption model with ninety (90) days advance notice.`,
+};
+
 
 function riskColor(score: number) {
   if (score <= 3) return { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-200', badge: 'bg-green-500' };
@@ -244,17 +310,26 @@ export default function ContractAnalyzer() {
 
       {/* Input Panel */}
       <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <FileText className="w-4 h-4 text-indigo-500" />
             Contract Text
           </h2>
-          <button
-            onClick={() => setContractText(SAMPLE_CONTRACT)}
-            className="text-xs text-indigo-600 hover:text-indigo-800 underline"
-          >
-            Load sample contract
-          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400">Load sample:</span>
+            <select
+              className="text-xs border border-gray-300 rounded-lg px-2 py-1 text-indigo-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              defaultValue=""
+              onChange={(e) => {
+                if (e.target.value) setContractText(SAMPLE_CONTRACTS[e.target.value]);
+              }}
+            >
+              <option value="" disabled>Choose contract...</option>
+              {Object.keys(SAMPLE_CONTRACTS).map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <textarea
           value={contractText}

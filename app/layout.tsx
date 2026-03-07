@@ -4,6 +4,7 @@ import { ClientProvider } from '@/lib/ClientContext';
 import LayoutShell from '@/components/layout/LayoutShell';
 import AgentButton from '@/components/agent/AgentButton';
 import { Analytics } from '@vercel/analytics/next';
+import { ThemeProvider } from 'next-themes';
 
 export const metadata: Metadata = {
   title: 'VendorLens — SaaS Spend Intelligence',
@@ -12,15 +13,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
-      <body className="bg-gray-50 text-gray-900 antialiased">
-        <ClientProvider>
-          <LayoutShell>{children}</LayoutShell>
-          <AgentButton />
-        </ClientProvider>
+      <body className="bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-slate-100 antialiased">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ClientProvider>
+            <LayoutShell>{children}</LayoutShell>
+            <AgentButton />
+          </ClientProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>
