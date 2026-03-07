@@ -45,9 +45,10 @@ export default function AgentDrawer({ onClose }: Props) {
     setInput('');
     setLoading(true);
 
-    // Gather context from localStorage
-    const tools = JSON.parse(localStorage.getItem('vendorlens_tools') || '[]');
-    const requests = JSON.parse(localStorage.getItem('vendorlens_requests') || '[]');
+    // Gather context from localStorage using the active client's keys
+    const clientId = localStorage.getItem('vendorlens_client') || 'nexus';
+    const tools = JSON.parse(localStorage.getItem(`vendorlens_tools_${clientId}`) || '[]');
+    const requests = JSON.parse(localStorage.getItem(`vendorlens_requests_${clientId}`) || '[]');
 
     try {
       const res = await fetch('/api/chat', {
