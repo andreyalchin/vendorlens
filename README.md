@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VendorLens — SaaS Spend Intelligence Platform
 
-## Getting Started
+Built by [Andrey Alchin](https://www.linkedin.com/in/aalchin/) · Senior Product Manager
 
-First, run the development server:
+A full-stack portfolio project demonstrating deep domain knowledge in SaaS procurement, software spend management, and approval workflows — the core problem space of modern procurement platforms.
+
+---
+
+## What it solves
+
+Enterprise software stacks grow faster than procurement teams can manage them. Teams end up paying for overlapping tools, missing renewal windows, and approving purchases without budget context. VendorLens surfaces those problems in one place:
+
+- **Spend visibility** — total stack cost, category breakdowns, cost-per-seat benchmarking
+- **Overlap detection** — automatically groups tools by category and flags redundancy with estimated savings
+- **Approval workflows** — structured intake process with requester/manager views, urgency signals, and budget impact context
+- **AI procurement assistant** — natural language queries against live stack data with actionable, linked responses
+
+---
+
+## Features
+
+### Dashboard
+- Summary cards for Total Annual Spend, Tools, Upcoming Renewals, and Avg Cost/Seat — each expandable into a detail chart
+- Annual spend by category — switchable between bar and donut views
+- Full tools table with column sorting, search, and category filtering
+- Add, edit, and delete tools inline
+
+### Overlap Detector
+- Automatically identifies categories with 2+ tools
+- Side-by-side comparison of overlapping tools (cost, seats, owner, renewal)
+- Estimated annual savings if consolidated
+- One-click "Consolidate" or "Keep Both" decision recording
+
+### Approval Workflow
+- **Requester view** — submit tool requests with use case, cost estimate, and urgency
+- **Manager view** — pending queue and history tab, budget impact vs. category average, approve/deny with comments
+- Status badges and full audit trail
+
+### AI Agent
+- Floating chat assistant powered by Claude (claude-haiku-4-5-20251001)
+- Reads live stack data per client — answers questions about savings, renewals, health score, seat utilization, and vendor risk
+- Structured markdown responses with clickable navigation links
+- Quick-action chips for common queries
+
+### Multi-client support
+- Switch between 3 demo clients (Nexus Systems, Orbit Analytics, Cascade Labs)
+- Each client has an isolated tool stack and approval pipeline
+- Data persists per client in localStorage
+
+---
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Charts | Recharts |
+| AI | Anthropic Claude API (streaming) |
+| State | localStorage + React hooks |
+| Deploy | Vercel |
+
+---
+
+## Running locally
 
 ```bash
+# Install dependencies
+npm install
+
+# Add your Anthropic API key
+echo "ANTHROPIC_API_KEY=sk-ant-..." > .env.local
+
+# Start dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> On first load, seed data is automatically populated for all three demo clients.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Product thinking behind the build
 
-To learn more about Next.js, take a look at the following resources:
+This project was scoped and built to reflect how a Senior PM approaches a product problem — not just feature delivery, but workflow design:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Overlap detection logic** mirrors how procurement teams actually audit stacks: category-first, not tool-first
+- **Approval workflow** has a dual-persona design (requester vs. manager) with contextual signals (budget impact vs. category average, urgency) that reduce back-and-forth
+- **AI agent capabilities** were chosen based on the 7 questions procurement managers ask most: savings, renewals, budget breakdown, queue digest, stack health, seat utilization, and vendor risk
+- **Multi-client architecture** reflects how procurement platforms serve multiple accounts with isolated data
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Author
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Andrey Alchin** — Senior Product Manager
+[linkedin.com/in/aalchin](https://www.linkedin.com/in/aalchin/)
