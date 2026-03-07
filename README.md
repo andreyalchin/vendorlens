@@ -63,20 +63,8 @@ Enterprise software stacks grow faster than procurement teams can manage them. T
 
 ---
 
-## Running locally
 
-```bash
-# Install dependencies
-npm install
-
-# Add your Anthropic API key
-echo "ANTHROPIC_API_KEY=sk-ant-..." > .env.local
-
-# Start dev server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
+Open [https://vendorlens.vercel.app/].
 
 > On first load, seed data is automatically populated for all three demo clients.
 
