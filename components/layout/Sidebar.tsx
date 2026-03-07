@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Layers, ClipboardCheck, Zap, ChevronDown, Building2 } from 'lucide-react';
+import {
+  LayoutDashboard, Layers, ClipboardCheck, Zap,
+  ChevronDown, Building2, X,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useClientContext } from '@/lib/ClientContext';
 
@@ -12,19 +15,31 @@ const nav = [
   { href: '/approvals', label: 'Approvals', icon: ClipboardCheck },
 ];
 
-export default function Sidebar() {
+interface Props {
+  onClose?: () => void;
+}
+
+export default function Sidebar({ onClose }: Props) {
   const pathname = usePathname();
   const { selectedClient, setSelectedClientId, clients } = useClientContext();
   const [open, setOpen] = useState(false);
 
   return (
-    <aside className="w-60 shrink-0 bg-white border-r border-gray-200 flex flex-col">
-      <div className="px-6 py-5 border-b border-gray-200">
-        <div className="flex items-center gap-2">
-          <Zap className="w-5 h-5 text-indigo-600" />
-          <span className="font-bold text-lg text-gray-900">VendorLens</span>
+    <aside className="w-64 md:w-60 h-full bg-white border-r border-gray-200 flex flex-col">
+      {/* Logo row — has close button on mobile */}
+      <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-indigo-600" />
+            <span className="font-bold text-lg text-gray-900">VendorLens</span>
+          </div>
+          <p className="text-xs text-gray-500 mt-0.5">SaaS Spend Intelligence</p>
         </div>
-        <p className="text-xs text-gray-500 mt-0.5">SaaS Spend Intelligence</p>
+        {onClose && (
+          <button onClick={onClose} className="md:hidden p-1 text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Client selector */}
@@ -48,7 +63,7 @@ export default function Sidebar() {
               {clients.map((client) => (
                 <button
                   key={client.id}
-                  onClick={() => { setSelectedClientId(client.id); setOpen(false); }}
+                  onClick={() => { setSelectedClientId(client.id); setOpen(false); if (onClose) onClose(); }}
                   className={`w-full flex items-start gap-2 px-3 py-2.5 text-left hover:bg-gray-50 transition-colors ${
                     client.id === selectedClient.id ? 'bg-indigo-50' : ''
                   }`}
@@ -74,7 +89,8 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              onClick={onClose}
+              className={`flex items-center gap-3 px-3 py-3 md:py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 active
                   ? 'bg-indigo-50 text-indigo-700'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'

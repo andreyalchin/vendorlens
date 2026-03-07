@@ -45,7 +45,6 @@ export default function AgentDrawer({ onClose }: Props) {
     setInput('');
     setLoading(true);
 
-    // Gather context from localStorage using the active client's keys
     const clientId = localStorage.getItem('vendorlens_client') || 'nexus';
     const tools = JSON.parse(localStorage.getItem(`vendorlens_tools_${clientId}`) || '[]');
     const requests = JSON.parse(localStorage.getItem(`vendorlens_requests_${clientId}`) || '[]');
@@ -91,23 +90,26 @@ export default function AgentDrawer({ onClose }: Props) {
   };
 
   return (
-    <div className="fixed bottom-20 right-5 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden"
-         style={{ height: '520px' }}>
+    /* Mobile: full-screen bottom sheet. Desktop: fixed right panel */
+    <div className="
+      fixed z-50 bg-white shadow-2xl border border-gray-200 flex flex-col overflow-hidden
+      inset-x-0 bottom-0 rounded-t-2xl
+      md:inset-x-auto md:bottom-20 md:right-5 md:w-96 md:rounded-2xl
+      h-[88vh] md:h-[520px]
+    ">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white">
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
         <div>
           <p className="font-semibold text-sm text-gray-900">VendorLens AI</p>
           <p className="text-xs text-gray-400">Powered by Claude</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={() =>
-              setMessages([
-                {
-                  role: 'assistant',
-                  content: "Chat cleared. Ask me anything about your SaaS stack!",
-                },
-              ])
+              setMessages([{
+                role: 'assistant',
+                content: 'Chat cleared. Ask me anything about your SaaS stack!',
+              }])
             }
             className="text-gray-400 hover:text-gray-600"
             title="Clear chat"
@@ -115,7 +117,7 @@ export default function AgentDrawer({ onClose }: Props) {
             <Trash2 className="w-4 h-4" />
           </button>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -137,7 +139,7 @@ export default function AgentDrawer({ onClose }: Props) {
       </div>
 
       {/* Quick chips */}
-      <div className="px-4 pb-2 flex gap-1.5 flex-wrap">
+      <div className="px-4 pb-2 flex gap-1.5 flex-wrap shrink-0">
         {QUICK_CHIPS.map((chip) => (
           <button
             key={chip}
@@ -150,8 +152,8 @@ export default function AgentDrawer({ onClose }: Props) {
       </div>
 
       {/* Input */}
-      <div className="px-4 pb-4">
-        <div className="flex gap-2 items-center border border-gray-300 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-indigo-500">
+      <div className="px-4 pb-4 shrink-0">
+        <div className="flex gap-2 items-center border border-gray-300 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-indigo-500">
           <input
             className="flex-1 text-sm outline-none bg-transparent"
             placeholder="Ask about your SaaS stack..."

@@ -209,7 +209,7 @@ export default function SummaryCards({ tools }: Props) {
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {cards.map(({ id, label, value, icon: Icon, color, bg }) => {
           const isOpen = expanded === id;
           return (

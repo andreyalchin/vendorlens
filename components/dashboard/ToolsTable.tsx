@@ -56,37 +56,24 @@ export default function ToolsTable({ tools, onAdd, onUpdate, onDelete }: Props) 
       const matchCat = category === 'All' || t.category === category;
       return matchSearch && matchCat;
     });
-
     if (sortKey) {
       result = [...result].sort((a, b) => {
         let av: string | number = a[sortKey] as string | number;
         let bv: string | number = b[sortKey] as string | number;
         if (sortKey === 'monthlyCost' || sortKey === 'seats') {
-          av = Number(av);
-          bv = Number(bv);
-          return sortDir === 'asc' ? av - bv : bv - av;
+          return sortDir === 'asc' ? Number(av) - Number(bv) : Number(bv) - Number(av);
         }
         av = String(av).toLowerCase();
         bv = String(bv).toLowerCase();
         return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
       });
     }
-
     return result;
   }, [tools, search, category, sortKey, sortDir]);
 
-  const handleEdit = (tool: Tool) => setEditTool(tool);
-
-  const handleUpdate = (updates: Omit<Tool, 'id'>) => {
-    if (editTool) {
-      onUpdate(editTool.id, updates);
-      setEditTool(null);
-    }
-  };
-
-  const Col = ({ k, label, right }: { k: SortKey; label: string; right?: boolean }) => (
+  const Col = ({ k, label, right, hide }: { k: SortKey; label: string; right?: boolean; hide?: string }) => (
     <th
-      className={`px-4 py-3 font-medium cursor-pointer select-none hover:text-indigo-600 transition-colors ${right ? 'text-right' : 'text-left'}`}
+      className={`px-3 md:px-4 py-3 font-medium cursor-pointer select-none hover:text-indigo-600 transition-colors ${right ? 'text-right' : 'text-left'} ${hide ?? ''}`}
       onClick={() => handleSort(k)}
     >
       {label}
@@ -96,19 +83,20 @@ export default function ToolsTable({ tools, onAdd, onUpdate, onDelete }: Props) 
 
   return (
     <div className="bg-white rounded-xl border border-gray-200">
-      <div className="p-5 border-b border-gray-100 flex flex-wrap items-center gap-3">
+      {/* Toolbar */}
+      <div className="p-4 md:p-5 border-b border-gray-100 flex flex-wrap items-center gap-2 md:gap-3">
         <h2 className="text-sm font-semibold text-gray-700 mr-auto">Tools</h2>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
           <input
             placeholder="Search..."
-            className="pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="pl-7 pr-3 py-1.5 border border-gray-300 rounded-lg text-sm w-32 md:w-auto focus:outline-none focus:ring-2 focus:ring-indigo-500"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <select
-          className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="border border-gray-300 rounded-lg px-2 md:px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           value={category}
           onChange={(e) => setCategory(e.target.value as 'All' | ToolCategory)}
         >
@@ -116,53 +104,58 @@ export default function ToolsTable({ tools, onAdd, onUpdate, onDelete }: Props) 
         </select>
         <button
           onClick={() => setShowAdd(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 whitespace-nowrap"
         >
           <Plus className="w-3.5 h-3.5" />
-          Add Tool
+          <span className="hidden sm:inline">Add Tool</span>
+          <span className="sm:hidden">Add</span>
         </button>
       </div>
 
+      {/* Table — horizontally scrollable on mobile */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-[520px]">
           <thead>
             <tr className="border-b border-gray-100 text-xs text-gray-500">
-              <th className="px-5 py-3 text-left font-medium cursor-pointer select-none hover:text-indigo-600" onClick={() => handleSort('name')}>
+              <th
+                className="px-4 md:px-5 py-3 text-left font-medium cursor-pointer select-none hover:text-indigo-600"
+                onClick={() => handleSort('name')}
+              >
                 Name <SortIcon col="name" sortKey={sortKey} sortDir={sortDir} />
               </th>
-              <Col k="category" label="Category" />
-              <Col k="monthlyCost" label="Monthly Cost" right />
-              <Col k="seats" label="Seats" right />
-              <Col k="owner" label="Owner" />
-              <Col k="renewalDate" label="Renewal" />
+              <Col k="category" label="Category" hide="hidden sm:table-cell" />
+              <Col k="monthlyCost" label="Cost/mo" right />
+              <Col k="seats" label="Seats" right hide="hidden md:table-cell" />
+              <Col k="owner" label="Owner" hide="hidden lg:table-cell" />
+              <Col k="renewalDate" label="Renewal" hide="hidden md:table-cell" />
               <Col k="status" label="Status" />
-              <th className="px-4 py-3" />
+              <th className="px-3 md:px-4 py-3" />
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
             {filtered.map((tool) => (
               <tr key={tool.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-5 py-3 font-medium text-gray-900">{tool.name}</td>
-                <td className="px-4 py-3 text-gray-600">{tool.category}</td>
-                <td className="px-4 py-3 text-right text-gray-900">${tool.monthlyCost.toLocaleString()}</td>
-                <td className="px-4 py-3 text-right text-gray-600">{tool.seats}</td>
-                <td className="px-4 py-3 text-gray-600">{tool.owner}</td>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="px-4 md:px-5 py-3 font-medium text-gray-900">{tool.name}</td>
+                <td className="px-3 md:px-4 py-3 text-gray-600 hidden sm:table-cell">{tool.category}</td>
+                <td className="px-3 md:px-4 py-3 text-right text-gray-900">${tool.monthlyCost.toLocaleString()}</td>
+                <td className="px-3 md:px-4 py-3 text-right text-gray-600 hidden md:table-cell">{tool.seats}</td>
+                <td className="px-3 md:px-4 py-3 text-gray-600 hidden lg:table-cell">{tool.owner}</td>
+                <td className="px-3 md:px-4 py-3 text-gray-600 hidden md:table-cell">
                   {new Date(tool.renewalDate).toLocaleDateString('en-US', {
                     month: 'short', day: 'numeric', year: 'numeric',
                   })}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-3 md:px-4 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[tool.status]}`}>
                     {tool.status}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-3 md:px-4 py-3">
                   <div className="flex items-center gap-2 justify-end">
-                    <button onClick={() => handleEdit(tool)} className="text-gray-400 hover:text-indigo-600">
+                    <button onClick={() => setEditTool(tool)} className="text-gray-400 hover:text-indigo-600 p-1">
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => onDelete(tool.id)} className="text-gray-400 hover:text-red-500">
+                    <button onClick={() => onDelete(tool.id)} className="text-gray-400 hover:text-red-500 p-1">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -181,7 +174,7 @@ export default function ToolsTable({ tools, onAdd, onUpdate, onDelete }: Props) 
       </div>
 
       {showAdd && <AddToolModal onClose={() => setShowAdd(false)} onAdd={onAdd} />}
-      {editTool && <AddToolModal onClose={() => setEditTool(null)} onAdd={handleUpdate} initial={editTool} />}
+      {editTool && <AddToolModal onClose={() => setEditTool(null)} onAdd={(u) => { onUpdate(editTool.id, u); setEditTool(null); }} initial={editTool} />}
     </div>
   );
 }

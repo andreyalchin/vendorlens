@@ -31,7 +31,7 @@ export default function SpendChart({ tools }: Props) {
   const total = data.reduce((s, d) => s + d.annual, 0);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-gray-700">Annual Spend by Category</h2>
         <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
@@ -57,61 +57,65 @@ export default function SpendChart({ tools }: Props) {
       </div>
 
       {chartType === 'bar' ? (
-        <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={data} margin={{ top: 4, right: 8, left: 8, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis
-              dataKey="category"
-              tick={{ fontSize: 11 }}
-              tickLine={false}
-              axisLine={false}
-              interval={0}
-              angle={-20}
-              textAnchor="end"
-              height={48}
-            />
-            <YAxis
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
-              tick={{ fontSize: 11 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <Tooltip
-              formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Annual Spend']}
-              contentStyle={{ fontSize: 12, borderRadius: 8 }}
-            />
-            <Bar dataKey="annual" radius={[4, 4, 0, 0]}>
-              {data.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      ) : (
-        <div className="flex items-center gap-6">
-          <ResponsiveContainer width="55%" height={260}>
-            <PieChart>
-              <Pie
-                data={data}
-                dataKey="annual"
-                nameKey="category"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                innerRadius={55}
-                paddingAngle={2}
-              >
-                {data.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                ))}
-              </Pie>
+        <div className="h-[200px] sm:h-[260px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 4, right: 8, left: 8, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis
+                dataKey="category"
+                tick={{ fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+                interval={0}
+                angle={-20}
+                textAnchor="end"
+                height={48}
+              />
+              <YAxis
+                tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                tick={{ fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+              />
               <Tooltip
                 formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Annual Spend']}
                 contentStyle={{ fontSize: 12, borderRadius: 8 }}
               />
-            </PieChart>
+              <Bar dataKey="annual" radius={[4, 4, 0, 0]}>
+                {data.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
-          <div className="flex-1 space-y-2">
+        </div>
+      ) : (
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+          <div className="h-[200px] w-full sm:w-[55%]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  dataKey="annual"
+                  nameKey="category"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  innerRadius={44}
+                  paddingAngle={2}
+                >
+                  {data.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Annual Spend']}
+                  contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex-1 w-full space-y-1.5">
             {data.map((d, i) => (
               <div key={d.category} className="flex items-center gap-2 text-xs">
                 <div className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
