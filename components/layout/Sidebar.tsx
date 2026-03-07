@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Layers, ClipboardCheck, Zap,
-  ChevronDown, Building2, X,
+  ChevronDown, Building2, X, FileSearch,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useClientContext } from '@/lib/ClientContext';
@@ -13,6 +13,7 @@ const nav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/overlaps', label: 'Overlap Detector', icon: Layers },
   { href: '/approvals', label: 'Approvals', icon: ClipboardCheck },
+  { href: '/contracts', label: 'Contract Intel', icon: FileSearch },
 ];
 
 interface Props {
