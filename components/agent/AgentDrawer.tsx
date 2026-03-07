@@ -10,11 +10,16 @@ interface Message {
 }
 
 const QUICK_CHIPS = [
-  'Savings opportunities',
-  'Upcoming renewals',
-  'Stack health score',
-  'Budget breakdown',
-  'Pending approvals',
+  { label: 'Savings opportunities', prompt: 'What SaaS tools can I consolidate to save money? Show me the overlapping categories and estimated annual savings.' },
+  { label: 'Upcoming renewals', prompt: 'Which contracts are renewing in the next 60 days? List them with costs and renewal dates.' },
+  { label: 'Stack health score', prompt: 'Give me a stack health score (0-10) covering overlap, coverage gaps, and cost efficiency. Break down each dimension.' },
+  { label: 'Top cost drivers', prompt: 'What are my top 5 biggest SaaS spend categories? Break down the annual cost and percentage of total spend.' },
+  { label: 'Pending approvals', prompt: 'Summarize my pending tool approval requests. Include requester, urgency, cost, and total budget ask.' },
+  { label: 'Vendor risk radar', prompt: 'Which SaaS categories have only one tool with no backup? Flag any single points of failure in my stack.' },
+  { label: 'Seat utilization', prompt: 'Are there tools where I might be overpaying for seats? Flag any tools with high seat counts relative to similar tools.' },
+  { label: 'Negotiation targets', prompt: 'Which contracts should I prioritize for negotiation at renewal? Consider cost, overlap, and renewal timing.' },
+  { label: 'Category breakdown', prompt: 'Break down my SaaS spend by category. Show annual spend and number of tools per category, sorted by cost.' },
+  { label: 'Consolidation plan', prompt: 'Build me a 90-day consolidation plan. Which overlapping tools should I cut first and in what order, based on cost savings and renewal dates?' },
 ];
 
 interface Props {
@@ -26,7 +31,7 @@ export default function AgentDrawer({ onClose }: Props) {
     {
       role: 'assistant',
       content:
-        "Hi! I'm your SaaS spend analyst. Ask me about your stack, overlaps, renewals, or approval queue.",
+        "Hi! I'm your SaaS spend analyst. Ask me about your stack, overlaps, renewals, or approval queue — or pick a quick action below.",
     },
   ]);
   const [input, setInput] = useState('');
@@ -90,18 +95,17 @@ export default function AgentDrawer({ onClose }: Props) {
   };
 
   return (
-    /* Mobile: full-screen bottom sheet. Desktop: fixed right panel */
     <div className="
-      fixed z-50 bg-white shadow-2xl border border-gray-200 flex flex-col overflow-hidden
+      fixed z-50 bg-white dark:bg-slate-800 shadow-2xl border border-gray-200 dark:border-slate-700 flex flex-col overflow-hidden
       inset-x-0 bottom-0 rounded-t-2xl
       md:inset-x-auto md:bottom-20 md:right-5 md:w-96 md:rounded-2xl
-      h-[88vh] md:h-[520px]
+      h-[88vh] md:h-[560px]
     ">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
+      <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between bg-white dark:bg-slate-800 shrink-0">
         <div>
-          <p className="font-semibold text-sm text-gray-900">VendorLens AI</p>
-          <p className="text-xs text-gray-400">Powered by Claude</p>
+          <p className="font-semibold text-sm text-gray-900 dark:text-slate-100">VendorLens AI</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500">Powered by Claude</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -111,12 +115,12 @@ export default function AgentDrawer({ onClose }: Props) {
                 content: 'Chat cleared. Ask me anything about your SaaS stack!',
               }])
             }
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
             title="Clear chat"
           >
             <Trash2 className="w-4 h-4" />
           </button>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -129,33 +133,36 @@ export default function AgentDrawer({ onClose }: Props) {
         ))}
         {loading && messages[messages.length - 1]?.role === 'user' && (
           <div className="flex gap-2 items-center">
-            <div className="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-indigo-100 dark:bg-indigo-900/40 rounded-full flex items-center justify-center">
               <div className="w-3 h-3 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
             </div>
-            <span className="text-xs text-gray-400">Thinking...</span>
+            <span className="text-xs text-gray-400 dark:text-slate-500">Thinking...</span>
           </div>
         )}
         <div ref={bottomRef} />
       </div>
 
-      {/* Quick chips */}
-      <div className="px-4 pb-2 flex gap-1.5 flex-wrap shrink-0">
-        {QUICK_CHIPS.map((chip) => (
-          <button
-            key={chip}
-            onClick={() => send(chip)}
-            className="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full hover:bg-indigo-100 transition-colors"
-          >
-            {chip}
-          </button>
-        ))}
+      {/* Quick chips — scrollable row */}
+      <div className="px-4 pb-2 shrink-0">
+        <p className="text-xs text-gray-400 dark:text-slate-500 mb-1.5">Quick actions</p>
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+          {QUICK_CHIPS.map((chip) => (
+            <button
+              key={chip.label}
+              onClick={() => send(chip.prompt)}
+              className="text-xs px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/50 whitespace-nowrap transition-colors shrink-0"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Input */}
       <div className="px-4 pb-4 shrink-0">
-        <div className="flex gap-2 items-center border border-gray-300 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-indigo-500">
+        <div className="flex gap-2 items-center border border-gray-300 dark:border-slate-600 dark:bg-slate-700/50 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-indigo-500">
           <input
-            className="flex-1 text-sm outline-none bg-transparent"
+            className="flex-1 text-sm outline-none bg-transparent text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500"
             placeholder="Ask about your SaaS stack..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -169,7 +176,7 @@ export default function AgentDrawer({ onClose }: Props) {
           <button
             onClick={() => send(input)}
             disabled={!input.trim() || loading}
-            className="text-indigo-600 hover:text-indigo-700 disabled:text-gray-300"
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 disabled:text-gray-300 dark:disabled:text-slate-600"
           >
             <Send className="w-4 h-4" />
           </button>

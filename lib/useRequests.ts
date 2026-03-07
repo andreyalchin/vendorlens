@@ -16,7 +16,7 @@ export function useRequests() {
     setLoaded(false);
     setRequests([]);
     const STORAGE_KEY = `vendorlens_requests_${clientId}`;
-    const SEEDED_KEY = `vendorlens_seeded_v2_${clientId}`;
+    const SEEDED_KEY = `vendorlens_seeded_v3_${clientId}`;
     const seeded = localStorage.getItem(SEEDED_KEY);
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!seeded || !stored) {

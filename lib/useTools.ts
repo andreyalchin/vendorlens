@@ -16,7 +16,7 @@ export function useTools() {
     setLoaded(false);
     setTools([]);
     const STORAGE_KEY = `vendorlens_tools_${clientId}`;
-    const SEEDED_KEY = `vendorlens_seeded_v2_${clientId}`;
+    const SEEDED_KEY = `vendorlens_seeded_v3_${clientId}`;
     const seeded = localStorage.getItem(SEEDED_KEY);
     if (!seeded) {
       const seeds = getSeedTools(clientId);

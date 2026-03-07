@@ -13,29 +13,33 @@ export default function ApprovalsPage() {
   const [viewMode, setViewMode] = useState<'requester' | 'manager'>('requester');
 
   if (!reqLoaded || !toolsLoaded) {
-    return <div className="p-8 text-gray-400 text-sm">Loading...</div>;
+    return (
+      <div className="p-4 md:p-6 space-y-4">
+        <div className="h-7 w-48 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
+        <div className="h-24 bg-gray-100 dark:bg-slate-800 rounded-xl animate-pulse" />
+        {[...Array(3)].map((_, i) => <div key={i} className="h-32 bg-gray-100 dark:bg-slate-800 rounded-xl animate-pulse" />)}
+      </div>
+    );
   }
-
-  const myRequests = requests; // in a real app this would be filtered by current user
 
   return (
     <div className="p-4 md:p-6 space-y-4 md:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Approval Workflow</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100">Approval Workflow</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
             Submit software requests and manage the approval queue
           </p>
         </div>
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-slate-700 rounded-lg p-1">
           {(['requester', 'manager'] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => setViewMode(mode)}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === mode
-                  ? 'bg-white shadow text-gray-900'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white dark:bg-slate-600 shadow text-gray-900 dark:text-slate-100'
+                  : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
               }`}
             >
               {mode === 'requester' ? 'Requester View' : 'Manager View'}
@@ -48,12 +52,12 @@ export default function ApprovalsPage() {
         <div className="space-y-6">
           <RequestForm onSubmit={submitRequest} />
           <div>
-            <h2 className="text-sm font-semibold text-gray-700 mb-3">My Requests</h2>
-            {myRequests.length === 0 ? (
-              <p className="text-sm text-gray-400">No requests submitted yet.</p>
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-3">My Requests</h2>
+            {requests.length === 0 ? (
+              <p className="text-sm text-gray-400 dark:text-slate-500">No requests submitted yet.</p>
             ) : (
               <div className="space-y-3">
-                {myRequests.map((req) => (
+                {requests.map((req) => (
                   <RequestCard key={req.id} request={req} />
                 ))}
               </div>
@@ -61,11 +65,7 @@ export default function ApprovalsPage() {
           </div>
         </div>
       ) : (
-        <ApprovalQueue
-          requests={requests}
-          tools={tools}
-          onReview={reviewRequest}
-        />
+        <ApprovalQueue requests={requests} tools={tools} onReview={reviewRequest} />
       )}
     </div>
   );
