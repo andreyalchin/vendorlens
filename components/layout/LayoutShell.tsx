@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Menu, Zap, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Sidebar from './Sidebar';
+import SplashScreen from './SplashScreen';
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -26,6 +27,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <SplashScreen />
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
@@ -61,7 +63,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
           <ThemeToggle />
         </header>
 
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-slate-900">{children}</main>
       </div>
     </div>
   );

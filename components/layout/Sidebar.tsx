@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Layers, ClipboardCheck, Zap,
-  ChevronDown, Building2, X, FileSearch, Sun, Moon,
+  ChevronDown, Building2, X, FileSearch, Sun, Moon, Users,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useClientContext } from '@/lib/ClientContext';
@@ -21,21 +21,102 @@ interface Props {
   onClose?: () => void;
 }
 
+const TIP_KEY = 'vendorlens_darkmode_tip';
+
+function VisitorCounter() {
+  const [count, setCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const SESSION_KEY = 'vl_visited';
+    const already = sessionStorage.getItem(SESSION_KEY);
+
+    if (already) {
+      // Already counted this session — just fetch current count
+      fetch('/api/visitors')
+        .then((r) => r.json())
+        .then((d) => setCount(d.count))
+        .catch(() => {});
+    } else {
+      // First page load this session — increment
+      sessionStorage.setItem(SESSION_KEY, '1');
+      fetch('/api/visitors', { method: 'POST' })
+        .then((r) => r.json())
+        .then((d) => setCount(d.count))
+        .catch(() => {});
+    }
+  }, []);
+
+  if (count === null) return null;
+
+  return (
+    <div className="flex items-center gap-1.5 px-3 py-1 text-xs text-gray-400 dark:text-slate-500">
+      <Users className="w-3 h-3 shrink-0" />
+      <span>{count.toLocaleString()} visitors</span>
+    </div>
+  );
+}
+
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [showTip, setShowTip] = useState(false);
+
   useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
-  return (
-    <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-    >
-      {theme === 'dark'
-        ? <><Sun className="w-4 h-4" /> Light mode</>
-        : <><Moon className="w-4 h-4" /> Dark mode</>
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const checkTip = () => {
+      const splashSeen = localStorage.getItem('vendorlens_splash_v1');
+      const tipSeen = localStorage.getItem(TIP_KEY);
+      if (splashSeen && !tipSeen && theme !== 'dark') {
+        setTimeout(() => setShowTip(true), 400);
       }
-    </button>
+    };
+
+    checkTip();
+    window.addEventListener('vendorlens:splashclosed', checkTip);
+    return () => window.removeEventListener('vendorlens:splashclosed', checkTip);
+  }, [mounted, theme]);
+
+  const dismissTip = () => {
+    localStorage.setItem(TIP_KEY, 'true');
+    setShowTip(false);
+  };
+
+  const toggle = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+    dismissTip();
+  };
+
+  if (!mounted) return null;
+
+  return (
+    <div className="relative">
+      {showTip && (
+        <div className="absolute bottom-full left-2 mb-2.5 flex items-center gap-2 bg-indigo-600 text-white text-xs px-3 py-2 rounded-lg shadow-lg z-50 whitespace-nowrap">
+          <Moon className="w-3 h-3 shrink-0" />
+          <span>Try Dark Mode</span>
+          <button
+            onClick={dismissTip}
+            className="ml-1 text-white/60 hover:text-white transition-colors"
+            aria-label="Dismiss"
+          >
+            <X className="w-3 h-3" />
+          </button>
+          <div className="absolute top-full left-5 border-[5px] border-transparent border-t-indigo-600" />
+        </div>
+      )}
+      <button
+        onClick={toggle}
+        className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+      >
+        {theme === 'dark'
+          ? <><Sun className="w-4 h-4" /> Light mode</>
+          : <><Moon className="w-4 h-4" /> Dark mode</>
+        }
+      </button>
+    </div>
   );
 }
 
@@ -45,7 +126,7 @@ export default function Sidebar({ onClose }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
-    <aside className="w-64 md:w-60 h-full bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col">
+    <aside className="w-64 h-full bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col">
       {/* Logo row */}
       <div className="px-6 py-5 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
         <div>
@@ -125,7 +206,13 @@ export default function Sidebar({ onClose }: Props) {
 
       <div className="px-3 py-3 border-t border-gray-200 dark:border-slate-700 space-y-1">
         <ThemeToggle />
-        <p className="text-xs text-gray-400 dark:text-slate-500 px-3 pb-1">Vendr PM Portfolio Demo</p>
+        <VisitorCounter />
+        <a
+          href="mailto:andrey.alchin@gmail.com"
+          className="block text-xs text-gray-400 dark:text-slate-500 px-3 pb-1 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors whitespace-nowrap"
+        >
+          Feedback — andrey.alchin@gmail.com
+        </a>
       </div>
     </aside>
   );

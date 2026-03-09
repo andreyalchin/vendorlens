@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Tool } from '@/lib/types';
 import {
   DollarSign, Package, AlertTriangle, TrendingDown,
-  ChevronDown, ChevronUp, X,
+  ChevronDown, ChevronUp,
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -63,11 +63,11 @@ function SpendPanel({ tools }: { tools: Tool[] }) {
         </div>
       </div>
       <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-2">Top 10 vendors by annual spend</p>
-      <div className="h-[220px]">
+      <div style={{ height: `${data.length * 32 + 20}px`, minHeight: 160 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} layout="vertical" margin={{ left: 4, right: 60, top: 0, bottom: 0 }}>
+          <BarChart data={data} layout="vertical" margin={{ left: 4, right: 64, top: 0, bottom: 0 }}>
             <XAxis type="number" tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 10, fill: '#9ca3af' }} tickLine={false} axisLine={false} />
-            <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} tickLine={false} axisLine={false} width={76} />
+            <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} tickLine={false} axisLine={false} width={88} interval={0} />
             <Tooltip formatter={(v) => [`$${Number(v).toLocaleString()}/yr`, 'Annual']} contentStyle={{ fontSize: 12, borderRadius: 8 }} />
             <Bar dataKey="annual" radius={[0, 4, 4, 0]}>
               {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
@@ -332,19 +332,22 @@ export default function KpiCards({ tools }: Props) {
       </div>
 
       {expanded && (
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-indigo-200 dark:border-indigo-800/60 px-5 pb-5 pt-4">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-indigo-200 dark:border-indigo-800/60 overflow-hidden">
+          <button
+            onClick={() => setExpanded(null)}
+            className="w-full flex items-center justify-between px-5 pt-4 pb-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+          >
             <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
               {cards.find((c) => c.id === expanded)?.label}
             </p>
-            <button
-              onClick={() => setExpanded(null)}
-              className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1.5 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300">
+              <span className="text-xs">collapse</span>
+              <ChevronUp className="w-4 h-4" />
+            </div>
+          </button>
+          <div className="px-5 pb-5">
+            {cards.find((c) => c.id === expanded)?.panel}
           </div>
-          {cards.find((c) => c.id === expanded)?.panel}
         </div>
       )}
     </div>
