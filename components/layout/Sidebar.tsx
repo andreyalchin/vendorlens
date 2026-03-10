@@ -12,9 +12,9 @@ import { useTheme } from 'next-themes';
 
 const nav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/contracts', label: 'Contract Intelligence', icon: FileSearch },
   { href: '/overlaps', label: 'Overlap Detector', icon: Layers },
   { href: '/approvals', label: 'Approvals', icon: ClipboardCheck },
-  { href: '/contracts', label: 'Contract Intel', icon: FileSearch },
 ];
 
 interface Props {
@@ -22,6 +22,7 @@ interface Props {
 }
 
 const TIP_KEY = 'vendorlens_darkmode_tip';
+const WALK_KEY = 'vendorlens_walk_v003b';
 
 function VisitorCounter() {
   const [count, setCount] = useState<number | null>(null);
@@ -67,7 +68,7 @@ function ThemeToggle() {
     if (!mounted) return;
 
     const checkTip = () => {
-      const splashSeen = localStorage.getItem('vendorlens_splash_v1');
+      const splashSeen = localStorage.getItem('vendorlens_splash_v003b');
       const tipSeen = localStorage.getItem(TIP_KEY);
       if (splashSeen && !tipSeen && theme !== 'dark') {
         setTimeout(() => setShowTip(true), 400);
@@ -124,6 +125,39 @@ export default function Sidebar({ onClose }: Props) {
   const pathname = usePathname();
   const { selectedClient, setSelectedClientId, clients } = useClientContext();
   const [open, setOpen] = useState(false);
+  const [walkStep, setWalkStep] = useState(0);
+
+  useEffect(() => {
+    function readStep() {
+      try { return parseInt(localStorage.getItem(WALK_KEY) || '0', 10) || 0; } catch { return 0; }
+    }
+    function writeStep(s: number) {
+      try { localStorage.setItem(WALK_KEY, String(s)); } catch {}
+      setWalkStep(s);
+      window.dispatchEvent(new CustomEvent('vendorlens:walkstep', { detail: s }));
+    }
+    const current = readStep();
+    if (current > 0) setWalkStep(current);
+    function tryStart() {
+      try {
+        if (localStorage.getItem('vendorlens_splash_v003b') && !readStep()) writeStep(1);
+      } catch {}
+    }
+    tryStart();
+    window.addEventListener('vendorlens:splashclosed', tryStart);
+    const onWalk = (e: Event) => setWalkStep((e as CustomEvent).detail);
+    window.addEventListener('vendorlens:walkstep', onWalk);
+    return () => {
+      window.removeEventListener('vendorlens:splashclosed', tryStart);
+      window.removeEventListener('vendorlens:walkstep', onWalk);
+    };
+  }, []);
+
+  function advanceWalk(step: number) {
+    try { localStorage.setItem(WALK_KEY, String(step)); } catch {}
+    setWalkStep(step);
+    window.dispatchEvent(new CustomEvent('vendorlens:walkstep', { detail: step }));
+  }
 
   return (
     <aside className="w-64 h-full bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col">
@@ -186,20 +220,39 @@ export default function Sidebar({ onClose }: Props) {
       <nav className="flex-1 px-3 py-4 space-y-1">
         {nav.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || pathname.startsWith(href + '/');
+          const isContracts = href === '/contracts';
           return (
-            <Link
-              key={href}
-              href={href}
-              onClick={onClose}
-              className={`flex items-center gap-3 px-3 py-3 md:py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                active
-                  ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
-                  : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-slate-100'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              {label}
-            </Link>
+            <div key={href} className="relative">
+              {isContracts && walkStep === 1 && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 flex items-center gap-2 bg-indigo-600 text-white text-xs px-3 py-2 rounded-lg shadow-lg z-50 whitespace-nowrap">
+                  <FileSearch className="w-3 h-3 shrink-0" />
+                  <span>Try Contract Intelligence</span>
+                  <button
+                    onClick={() => advanceWalk(99)}
+                    className="ml-1 text-white/60 hover:text-white transition-colors"
+                    aria-label="Dismiss"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-indigo-600" />
+                </div>
+              )}
+              <Link
+                href={href}
+                onClick={() => {
+                  if (isContracts && walkStep === 1) advanceWalk(2);
+                  onClose?.();
+                }}
+                className={`flex items-center gap-3 px-3 py-3 md:py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  active
+                    ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                    : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-slate-100'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {label}
+              </Link>
+            </div>
           );
         })}
       </nav>

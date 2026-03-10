@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ContractAnalysis } from '@/lib/types';
 import {
   AlertTriangle, CheckCircle, Clock, DollarSign, Lock, TrendingUp,
-  FileText, Lightbulb, Mail, ChevronUp, Calendar,
+  FileText, Lightbulb, Mail, ChevronUp, Calendar, X,
 } from 'lucide-react';
+
+const WALK_KEY = 'vendorlens_walk_v003b';
 
 const SAMPLE_CONTRACTS: Record<string, string> = {
   'Linear — Startup Plan': `SOFTWARE SUBSCRIPTION AGREEMENT — LINEAR, INC.
@@ -322,7 +324,7 @@ function RiskTimeline({ timeline }: { timeline: ContractAnalysis['timeline'] }) 
   );
 }
 
-function NegotiationEmail({ analysis }: { analysis: ContractAnalysis }) {
+function NegotiationEmail({ analysis, showWalkTip, onWalkDone }: { analysis: ContractAnalysis; showWalkTip?: boolean; onWalkDone?: () => void }) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -378,10 +380,21 @@ Write a concise, professional email from a procurement manager requesting a nego
           <Mail className="w-4 h-4 text-indigo-500" />
           Negotiation Email Generator
         </h3>
-        <button
-          onClick={open ? () => setOpen(false) : generate}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 transition-colors"
-        >
+        <div className="relative">
+          {showWalkTip && (
+            <div className="absolute bottom-full right-0 mb-2 flex items-center gap-2 bg-indigo-600 text-white text-xs px-3 py-2 rounded-lg shadow-lg z-50 whitespace-nowrap">
+              <Mail className="w-3 h-3 shrink-0" />
+              <span>Generate a negotiation email</span>
+              <button onClick={onWalkDone} className="ml-1 text-white/60 hover:text-white transition-colors" aria-label="Dismiss">
+                <X className="w-3 h-3" />
+              </button>
+              <div className="absolute top-full right-4 border-[5px] border-transparent border-t-indigo-600" />
+            </div>
+          )}
+          <button
+            onClick={() => { if (showWalkTip) onWalkDone?.(); if (open) setOpen(false); else generate(); }}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 transition-colors"
+          >
           {loading ? (
             <span className="animate-pulse">Generating...</span>
           ) : open ? (
@@ -389,7 +402,8 @@ Write a concise, professional email from a procurement manager requesting a nego
           ) : (
             <>Generate Email <Mail className="w-3 h-3" /></>
           )}
-        </button>
+          </button>
+        </div>
       </div>
       <p className="text-xs text-gray-500 dark:text-slate-400">AI-generated negotiation email based on detected risks and recommendations.</p>
 
@@ -417,6 +431,30 @@ export default function ContractAnalyzer() {
   const [analysis, setAnalysis] = useState<ContractAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [walkStep, setWalkStep] = useState(0);
+
+  useEffect(() => {
+    try {
+      const s = parseInt(localStorage.getItem(WALK_KEY) || '0', 10) || 0;
+      if (s === 1) {
+        // User arrived on contracts page via direct nav — skip sidebar step
+        localStorage.setItem(WALK_KEY, '2');
+        setWalkStep(2);
+        window.dispatchEvent(new CustomEvent('vendorlens:walkstep', { detail: 2 }));
+      } else {
+        setWalkStep(s);
+      }
+    } catch {}
+    const onWalk = (e: Event) => setWalkStep((e as CustomEvent).detail);
+    window.addEventListener('vendorlens:walkstep', onWalk);
+    return () => window.removeEventListener('vendorlens:walkstep', onWalk);
+  }, []);
+
+  function advanceWalk(step: number) {
+    try { localStorage.setItem(WALK_KEY, String(step)); } catch {}
+    setWalkStep(step);
+    window.dispatchEvent(new CustomEvent('vendorlens:walkstep', { detail: step }));
+  }
 
   async function analyze() {
     if (!contractText.trim()) return;
@@ -432,6 +470,9 @@ export default function ContractAnalyzer() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Analysis failed');
       setAnalysis(data);
+      try {
+        if (parseInt(localStorage.getItem(WALK_KEY) || '0', 10) === 3) advanceWalk(4);
+      } catch {}
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed');
     } finally {
@@ -457,18 +498,35 @@ export default function ContractAnalyzer() {
           </h2>
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-xs text-gray-400 dark:text-slate-500 shrink-0">Load sample:</span>
-            <select
-              className="text-xs border border-gray-300 dark:border-slate-600 rounded-lg px-2 py-1 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[200px] truncate"
-              defaultValue=""
-              onChange={(e) => {
-                if (e.target.value) setContractText(SAMPLE_CONTRACTS[e.target.value]);
-              }}
-            >
-              <option value="" disabled>Choose contract...</option>
-              {Object.keys(SAMPLE_CONTRACTS).map((name) => (
-                <option key={name} value={name}>{name}</option>
-              ))}
-            </select>
+            <div className="relative">
+              {walkStep === 2 && (
+                <div className="absolute bottom-full right-0 mb-2 flex items-center gap-2 bg-indigo-600 text-white text-xs px-3 py-2 rounded-lg shadow-lg z-50 whitespace-nowrap">
+                  <FileText className="w-3 h-3 shrink-0" />
+                  <span>Load a sample contract</span>
+                  <button onClick={() => advanceWalk(99)} className="ml-1 text-white/60 hover:text-white transition-colors" aria-label="Dismiss">
+                    <X className="w-3 h-3" />
+                  </button>
+                  <div className="absolute top-full right-4 border-[5px] border-transparent border-t-indigo-600" />
+                </div>
+              )}
+              <select
+                className="text-xs border border-gray-300 dark:border-slate-600 rounded-lg px-2 py-1 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[200px] truncate"
+                defaultValue=""
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setContractText(SAMPLE_CONTRACTS[e.target.value]);
+                    try {
+                      if (parseInt(localStorage.getItem(WALK_KEY) || '0', 10) === 2) advanceWalk(3);
+                    } catch {}
+                  }
+                }}
+              >
+                <option value="" disabled>Choose contract...</option>
+                {Object.keys(SAMPLE_CONTRACTS).map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
         <textarea
@@ -480,20 +538,32 @@ export default function ContractAnalyzer() {
         />
         <div className="flex items-center justify-between">
           <span className="text-xs text-gray-400 dark:text-slate-500">{contractText.length} characters</span>
-          <button
-            onClick={analyze}
-            disabled={loading || contractText.trim().length < 50}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                Analyzing...
-              </>
-            ) : (
-              'Analyze Contract'
+          <div className="relative">
+            {walkStep === 3 && (
+              <div className="absolute bottom-full right-0 mb-2 flex items-center gap-2 bg-indigo-600 text-white text-xs px-3 py-2 rounded-lg shadow-lg z-50 whitespace-nowrap">
+                <AlertTriangle className="w-3 h-3 shrink-0" />
+                <span>Analyze it with AI</span>
+                <button onClick={() => advanceWalk(99)} className="ml-1 text-white/60 hover:text-white transition-colors" aria-label="Dismiss">
+                  <X className="w-3 h-3" />
+                </button>
+                <div className="absolute top-full right-4 border-[5px] border-transparent border-t-indigo-600" />
+              </div>
             )}
-          </button>
+            <button
+              onClick={analyze}
+              disabled={loading || contractText.trim().length < 50}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                'Analyze Contract'
+              )}
+            </button>
+          </div>
         </div>
         {error && <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg px-3 py-2">{error}</p>}
       </div>
@@ -537,7 +607,7 @@ export default function ContractAnalyzer() {
           </div>
 
           {/* Negotiation Email Generator — shown early so users can act immediately */}
-          <NegotiationEmail analysis={analysis} />
+          <NegotiationEmail analysis={analysis} showWalkTip={walkStep === 4} onWalkDone={() => advanceWalk(99)} />
 
           {/* Risk Timeline */}
           <RiskTimeline timeline={analysis.timeline} />
